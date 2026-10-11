@@ -20,10 +20,6 @@ if [ -d "$root/dist/extensions" ]; then
       mkdir -p "$root/extensions/$name"
       cp "$manifest" "$root/extensions/$name/openclaw.plugin.json"
     done
-
-  # Relative imports and module identity must use the canonical dist graph.
-  rm -rf "$root/dist-runtime"
-  ln -s dist "$root/dist-runtime"
 fi
 
 if [ -n "${OPENCLAW_BUNDLED_ACPX:-}" ]; then

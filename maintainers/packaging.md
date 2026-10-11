@@ -71,9 +71,10 @@ build.
 Production deployment uses pnpm's package-file and workspace-dependency rules.
 It preserves declared launchers and runtime helpers while excluding development
 files, and package symlinks must remain valid after the build store is removed.
-Both package routes share the Nix runtime layout: extension manifests, a canonical
-`dist-runtime` alias, and the pinned ACPX bundle. The source wrapper invokes the
-manifest's `openclaw` executable in Nix mode.
+Both package routes share the Nix runtime layout: extension manifests and the
+pinned ACPX bundle, with every plugin module reached through physical paths under
+`dist`. The source wrapper invokes the manifest's `openclaw` executable in Nix
+mode.
 
 Build timestamps come from `SOURCE_DATE_EPOCH`. For the pinned source archive,
 provenance records its full Git SHA; arbitrary source overrides are not stamped

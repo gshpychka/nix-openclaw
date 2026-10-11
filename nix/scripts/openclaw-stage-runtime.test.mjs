@@ -25,11 +25,11 @@ for (const separateSource of [false, true]) {
     if (separateSource) args.push(source);
     const result = spawnSync("sh", args, { encoding: "utf8", env: { ...process.env, OPENCLAW_BUNDLED_ACPX: "" } });
     assert.equal(result.status, 0, result.stderr);
-    for (const directory of ["dist/extensions", "extensions", "dist-runtime/extensions"]) {
+    for (const directory of ["dist/extensions", "extensions"]) {
       assert.equal(fs.readFileSync(path.join(root, directory, "legacy/openclaw.plugin.json"), "utf8"), '{"id":"legacy"}');
       assert.equal(fs.readFileSync(path.join(root, directory, "modern/openclaw.plugin.json"), "utf8"), '{"id":"modern"}');
     }
     assert.equal(fs.existsSync(path.join(root, "dist/extensions/unbuilt")), false);
-    assert.equal(fs.readlinkSync(path.join(root, "dist-runtime")), "dist");
+    assert.equal(fs.existsSync(path.join(root, "dist-runtime")), false);
   });
 }

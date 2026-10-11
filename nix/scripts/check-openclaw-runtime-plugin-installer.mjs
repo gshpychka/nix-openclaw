@@ -66,18 +66,18 @@ if (!output.includes("publish npm-shrinkwrap.json")) {
   throw new Error(`optional-only dependency failure did not explain shrinkwrap requirement:\n${output}`);
 }
 
-const aliasRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-runtime-plugin-alias-check-"));
-const aliasPluginRoot = path.join(aliasRoot, "plugin");
-const aliasOut = path.join(aliasRoot, "out");
-const aliasRuntimeEntriesFile = path.join(aliasRoot, "runtime-entries");
-const aliasBundledRootsFile = path.join(aliasRoot, "bundled-roots");
+const entryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-runtime-plugin-entry-check-"));
+const entryPluginRoot = path.join(entryRoot, "plugin");
+const entryOut = path.join(entryRoot, "out");
+const entryRuntimeEntriesFile = path.join(entryRoot, "runtime-entries");
+const entryBundledRootsFile = path.join(entryRoot, "bundled-roots");
 
-fs.mkdirSync(path.join(aliasPluginRoot, "dist"), { recursive: true });
+fs.mkdirSync(path.join(entryPluginRoot, "dist"), { recursive: true });
 fs.writeFileSync(
-  path.join(aliasPluginRoot, "package.json"),
+  path.join(entryPluginRoot, "package.json"),
   JSON.stringify(
     {
-      name: "@openclaw/test-runtime-aliases",
+      name: "@openclaw/test-runtime-entries",
       version: "1.0.0",
       openclaw: {
         runtimeExtensions: ["./dist/index.js"],
@@ -88,39 +88,38 @@ fs.writeFileSync(
   ),
 );
 fs.writeFileSync(
-  path.join(aliasPluginRoot, "openclaw.plugin.json"),
-  JSON.stringify({ id: "runtime-aliases", name: "Runtime Aliases" }, null, 2),
+  path.join(entryPluginRoot, "openclaw.plugin.json"),
+  JSON.stringify({ id: "runtime-entries", name: "Runtime Entries" }, null, 2),
 );
 for (const basename of ["index.js", "register.runtime.js", "runtime-api.js", "setup-api.js"]) {
-  fs.writeFileSync(path.join(aliasPluginRoot, "dist", basename), "export default {};\n");
+  fs.writeFileSync(path.join(entryPluginRoot, "dist", basename), "export default {};\n");
 }
-fs.writeFileSync(aliasRuntimeEntriesFile, "./dist/index.js\n");
-fs.writeFileSync(aliasBundledRootsFile, "");
+fs.writeFileSync(entryRuntimeEntriesFile, "./dist/index.js\n");
+fs.writeFileSync(entryBundledRootsFile, "");
 
-const aliasResult = spawnSync(process.execPath, [installer], {
-  cwd: aliasPluginRoot,
+const entryResult = spawnSync(process.execPath, [installer], {
+  cwd: entryPluginRoot,
   env: {
     ...process.env,
-    out: aliasOut,
-    OPENCLAW_RUNTIME_PLUGIN_ID: "runtime-aliases",
-    OPENCLAW_RUNTIME_PLUGIN_RUNTIME_ENTRIES_FILE: aliasRuntimeEntriesFile,
-    OPENCLAW_RUNTIME_PLUGIN_BUNDLED_PACKAGE_ROOTS_FILE: aliasBundledRootsFile,
+    out: entryOut,
+    OPENCLAW_RUNTIME_PLUGIN_ID: "runtime-entries",
+    OPENCLAW_RUNTIME_PLUGIN_RUNTIME_ENTRIES_FILE: entryRuntimeEntriesFile,
+    OPENCLAW_RUNTIME_PLUGIN_BUNDLED_PACKAGE_ROOTS_FILE: entryBundledRootsFile,
     OPENCLAW_RUNTIME_PLUGIN_DEPENDENCY_MODE: "none",
     OPENCLAW_RUNTIME_PLUGIN_LINK_PEER_OPENCLAW: "0",
   },
   encoding: "utf8",
 });
 
-if (aliasResult.status !== 0) {
-  throw new Error(`runtime alias fixture failed:\n${aliasResult.stdout}\n${aliasResult.stderr}`);
+if (entryResult.status !== 0) {
+  throw new Error(`runtime entry fixture failed:\n${entryResult.stdout}\n${entryResult.stderr}`);
 }
 
 for (const basename of ["index.js", "register.runtime.js", "runtime-api.js", "setup-api.js"]) {
-  const aliasPath = path.join(aliasOut, basename);
-  if (!fs.existsSync(aliasPath)) {
-    throw new Error(`runtime alias missing: ${basename}`);
+  if (fs.existsSync(path.join(entryOut, basename))) {
+    throw new Error(`runtime entry duplicated at the plugin root: ${basename}`);
   }
-  if (!fs.lstatSync(aliasPath).isSymbolicLink()) {
-    throw new Error(`runtime alias is not a symlink: ${basename}`);
+  if (!fs.lstatSync(path.join(entryOut, "dist", basename)).isFile()) {
+    throw new Error(`runtime entry is not a regular file: dist/${basename}`);
   }
 }

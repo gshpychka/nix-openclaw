@@ -19,15 +19,18 @@ require_path "${root}/extensions"
 require_path "${root}/extensions/memory-core"
 require_path "${root}/extensions/memory-core/openclaw.plugin.json"
 require_path "${root}/dist/extensions/memory-core/openclaw.plugin.json"
-require_path "${root}/dist-runtime/extensions"
-require_path "${root}/dist-runtime/extensions/memory-core/openclaw.plugin.json"
-require_path "${root}/dist-runtime/extensions/acpx/openclaw.plugin.json"
-require_path "${root}/dist-runtime/extensions/acpx/package.json"
-require_path "${root}/dist-runtime/extensions/acpx/index.js"
-require_path "${root}/dist-runtime/extensions/acpx/register.runtime.js"
-require_path "${root}/dist-runtime/extensions/acpx/runtime-api.js"
-require_path "${root}/dist-runtime/extensions/acpx/setup-api.js"
-require_path "${root}/dist-runtime/extensions/acpx/skills/acp-router/SKILL.md"
+require_path "${root}/dist/extensions/acpx/openclaw.plugin.json"
+require_path "${root}/dist/extensions/acpx/package.json"
+require_path "${root}/dist/extensions/acpx/dist/index.js"
+require_path "${root}/dist/extensions/acpx/dist/register.runtime.js"
+require_path "${root}/dist/extensions/acpx/dist/runtime-api.js"
+require_path "${root}/dist/extensions/acpx/dist/setup-api.js"
+require_path "${root}/dist/extensions/acpx/skills/acp-router/SKILL.md"
+# OpenClaw rejects plugin module paths that pass through a symlink
+if [ -e "${root}/dist-runtime" ] || [ -n "$(find "${root}/dist/extensions/acpx" -maxdepth 1 -type l)" ]; then
+  echo "Symlinked plugin runtime path in ${root}" >&2
+  exit 1
+fi
 require_path "${root}/docs/reference/templates"
 for template in AGENTS SOUL IDENTITY USER BOOTSTRAP TOOLS; do
   require_path "${root}/docs/reference/templates/${template}.md"

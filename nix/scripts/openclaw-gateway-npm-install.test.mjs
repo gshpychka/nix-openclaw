@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import {
-  fixture, install, resolveFrom, put, dependency, snapshot, legacyNames, acpxAliases, pluginInstaller,
+  fixture, install, resolveFrom, put, dependency, snapshot, legacyNames, acpxEntries, pluginInstaller,
 } from "./openclaw-gateway-npm-install.fixtures.mjs";
 
 for (const layout of ["mixed", "nested", "hoisted"]) {
@@ -34,11 +34,8 @@ for (const layout of ["mixed", "nested", "hoisted"]) {
     assert.equal(fs.statSync(path.join(f.out, "lib/node_modules/.bin/marker")).mode & 0o777, 0o755);
     assert.equal(fs.existsSync(path.join(f.out, "lib/node_modules/omitted-platform-addon")), false);
     assert.equal(fs.existsSync(path.join(f.root, "node_modules")), layout !== "hoisted");
-    for (const rel of [
-      "extensions/memory-core/openclaw.plugin.json",
-      "dist-runtime/extensions/memory-core/openclaw.plugin.json",
-    ])
-      assert.equal(fs.readFileSync(path.join(f.root, rel), "utf8"), '{"id":"memory-core"}');
+    assert.equal(fs.readFileSync(path.join(f.root, "extensions/memory-core/openclaw.plugin.json"), "utf8"), '{"id":"memory-core"}');
+    assert.equal(fs.existsSync(path.join(f.root, "dist-runtime")), false);
     assert.deepEqual(fs.readFileSync(path.join(f.out, "wrapper-args"), "utf8").trim().split("\n"), [
       process.execPath,
       path.join(f.out, "bin/openclaw"),
@@ -58,59 +55,28 @@ for (const layout of ["mixed", "nested", "hoisted"]) {
   });
 }
 
-for (const ext of ["js", "mjs"]) {
-  test(`${ext}: staged relative imports retain one canonical module graph`, (t) => {
-    const f = fixture(t);
-    const entry = "extensions/memory-core/provider-policy-api.js";
-    put(f.packageRoot, `dist/${entry}`, `export { state } from "../../state.${ext}";\n`);
-    put(f.packageRoot, `dist/state.${ext}`, `export { state } from "./nested/state.${ext}";\n`);
-    put(f.packageRoot, `dist/nested/state.${ext}`, "export const state = {};\n");
-    const original = snapshot(path.join(f.packageRoot, "dist"));
-    install(f);
-    const copied = snapshot(path.join(f.root, "dist"));
-    for (const name of Object.keys(copied)) if (name.startsWith("extensions/acpx/")) delete copied[name];
-    assert.deepEqual(copied, original);
-    const code = `
-import assert from "node:assert/strict";
-import { pathToFileURL } from "node:url";
-const [root, entry] = process.argv.slice(1);
-const staged = await import(pathToFileURL(root + "/dist-runtime/" + entry));
-const direct = await import(pathToFileURL(root + "/dist/" + entry));
-assert.strictEqual(staged.state, direct.state);
-`;
-    const loaded = f.node(code, f.root, entry);
-    assert.equal(loaded.status, 0, loaded.stderr);
-    fs.unlinkSync(path.join(f.root, `dist/nested/state.${ext}`));
-    const missing = f.node(code, f.root, entry);
-    assert.notEqual(missing.status, 0);
-    assert.match(missing.stderr, /ERR_MODULE_NOT_FOUND/);
-  });
-}
-
 test("bundled ACPX stays physically contained with its complete built closure", (t) => {
   const f = fixture(t);
   const original = snapshot(f.acpx);
   install(f);
-  for (const spelling of ["dist-runtime", "dist"]) {
-    const bundled = fs.realpathSync(path.join(f.root, spelling, "extensions"));
-    const acpx = path.join(bundled, "acpx");
-    assert.ok(fs.realpathSync(acpx).startsWith(`${bundled}/`), "ACPX package directory escapes bundled root");
-    assert.deepEqual(snapshot(acpx), original);
-  }
+  const bundled = fs.realpathSync(path.join(f.root, "dist/extensions"));
+  const acpx = path.join(bundled, "acpx");
+  assert.ok(fs.realpathSync(acpx).startsWith(`${bundled}/`), "ACPX package directory escapes bundled root");
+  assert.deepEqual(snapshot(acpx), original);
   assert.deepEqual(snapshot(f.acpx), original);
   fs.rmSync(f.acpx, { recursive: true });
   const result = f.node(
     `
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
-for (const dir of ["dist", "dist-runtime"]) for (const name of JSON.parse(process.argv[2])) {
-  const { default: dependency } = await import(pathToFileURL(process.argv[1] + "/" + dir + "/extensions/acpx/" + name));
+for (const name of JSON.parse(process.argv[2])) {
+  const { default: dependency } = await import(pathToFileURL(process.argv[1] + "/dist/extensions/acpx/dist/" + name));
   assert.equal(dependency.marker, 9);
   assert.ok(dependency.file.startsWith(process.argv[3] + "/"));
 }
 `,
     f.root,
-    JSON.stringify(acpxAliases),
+    JSON.stringify(acpxEntries),
     f.out,
   );
   assert.equal(result.status, 0, result.stderr);

@@ -217,12 +217,16 @@ function packageFixture(t, ext, files = ["src/agents/templates/"]) {
     fs.writeFileSync(path.join(root, name), text);
   };
   const entrypoints = ["index.js", "register.runtime.js", "runtime-api.js", "setup-api.js"];
-  const acpx = ["openclaw.plugin.json", "package.json", ...entrypoints, "skills/acp-router/SKILL.md"];
+  const acpx = [
+    "openclaw.plugin.json",
+    "package.json",
+    ...entrypoints.map((name) => `dist/${name}`),
+    "skills/acp-router/SKILL.md",
+  ];
   const required = [
     "extensions/memory-core/openclaw.plugin.json",
     "dist/extensions/memory-core/openclaw.plugin.json",
-    "dist-runtime/extensions/memory-core/openclaw.plugin.json",
-    ...acpx.map((name) => `dist-runtime/extensions/acpx/${name}`),
+    ...acpx.map((name) => `dist/extensions/acpx/${name}`),
     ...templateDocs.map((name) => `docs/reference/templates/${name}.md`),
     "src/agents/templates/HEARTBEAT.md",
     "skills/example/SKILL.md",

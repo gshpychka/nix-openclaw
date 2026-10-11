@@ -8,7 +8,7 @@ const installer = path.join(import.meta.dirname, "openclaw-gateway-npm-install.s
 const checker = path.join(import.meta.dirname, "check-package-contents.sh");
 const pluginInstaller = path.join(import.meta.dirname, "runtime-plugin/install.mjs");
 const legacyNames = ["hasown", "combined-stream"];
-const acpxAliases = ["index.js", "register.runtime.js", "runtime-api.js", "setup-api.js"];
+const acpxEntries = ["index.js", "register.runtime.js", "runtime-api.js", "setup-api.js"];
 
 function put(root, name, text = "") {
   const file = path.join(root, name);
@@ -97,9 +97,8 @@ export { loadBundledPluginPublicArtifactModuleSync };
   put(acpx, "openclaw.plugin.json", '{"id":"acpx"}');
   put(acpx, "skills/acp-router/SKILL.md", "fixture");
   dependency(path.join(acpx, "node_modules"), "@fixture/acpx-dep", 9);
-  for (const name of acpxAliases) {
+  for (const name of acpxEntries) {
     put(acpx, `dist/${name}`, 'export { default } from "@fixture/acpx-dep";\n');
-    fs.symlinkSync(`dist/${name}`, path.join(acpx, name));
   }
   put(modules, ".fixture-marker", "retained");
   const bin = put(limit, "bin/marker", "#!/bin/sh\nexit 0\n");
@@ -180,4 +179,4 @@ console.log(JSON.stringify(JSON.parse(process.argv[2]).map(name => require(name)
   );
 }
 
-export { fixture, install, resolveFrom, put, dependency, snapshot, legacyNames, acpxAliases, pluginInstaller };
+export { fixture, install, resolveFrom, put, dependency, snapshot, legacyNames, acpxEntries, pluginInstaller };

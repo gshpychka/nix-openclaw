@@ -161,7 +161,7 @@ for (const ext of ["js", "mjs"])
         if (fault === "symlink-only") fs.symlinkSync("worker/worker.mjs", f.loader);
       }
       if (fault === "reject-hardlinks") fs.appendFileSync(f.loader, "\n// rejectHardlinks: true\n");
-      if (fault === "missing-path") fs.unlinkSync(path.join(f.root, "dist-runtime/extensions/acpx/setup-api.js"));
+      if (fault === "missing-path") fs.unlinkSync(path.join(f.root, "dist/extensions/acpx/dist/setup-api.js"));
       if (fault === "broken-alias") fs.unlinkSync(path.join(f.root, "dist/target.js"));
       if (fault === "empty-artifact") f.put("dist/provider-policy-api.cjs", "module.exports = null;\n");
       const result = f.run();
