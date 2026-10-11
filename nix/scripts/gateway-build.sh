@@ -74,9 +74,9 @@ if [ -n "${OPENCLAW_NIX_TSC_MAX_OLD_SPACE_MB:-}" ]; then
   echo "OPENCLAW_NIX_TSC_MAX_OLD_SPACE_MB is retired: upstream no longer has a separate tsc build stage. Use upstream build controls or NODE_OPTIONS." >&2
   exit 1
 fi
-if [ -n "${OPENCLAW_NIX_TSDOWN_MAX_OLD_SPACE_MB:-}" ]; then
-  export OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB="$OPENCLAW_NIX_TSDOWN_MAX_OLD_SPACE_MB"
-fi
+# The build sandbox hides the cgroup memory limit, so the compiler heap is explicit;
+# 12288 MB matches OpenClaw's default for a host without a limit.
+export OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB="${OPENCLAW_NIX_TSDOWN_MAX_OLD_SPACE_MB:-12288}"
 
 if [ -n "$(jq -r '.scripts["build:package"] // empty' package.json)" ]; then
   log_step "build:package" pnpm run build:package

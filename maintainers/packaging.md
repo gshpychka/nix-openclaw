@@ -80,5 +80,7 @@ provenance records its full Git SHA; arbitrary source overrides are not stamped
 with the default pin's identity.
 
 Use upstream build resource controls or `NODE_OPTIONS`. The Nix TSDOWN override
-forwards to `OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB`; the separate Nix TSC override is
-retired because the current upstream build has no independent tsc stage.
+forwards to `OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB`. It defaults to 12288 MB, OpenClaw's
+default for a host without a memory limit, because the build sandbox hides the
+cgroup limit. The separate Nix TSC override is retired because the current
+upstream build has no independent tsc stage.
