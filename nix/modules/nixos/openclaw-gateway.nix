@@ -201,10 +201,6 @@ in
       environment = {
         OPENCLAW_CONFIG_PATH = cfg.configPath;
         OPENCLAW_STATE_DIR = cfg.stateDir;
-
-        # Backward-compatible env names.
-        CLAWDBOT_CONFIG_PATH = cfg.configPath;
-        CLAWDBOT_STATE_DIR = cfg.stateDir;
       }
       // cfg.environment;
 
