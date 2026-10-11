@@ -1,6 +1,10 @@
+diff --git a/src/plugins/discovery.ts b/src/plugins/discovery.ts
+index 41a6499df80..683c425b426 100644
 --- a/src/plugins/discovery.ts
 +++ b/src/plugins/discovery.ts
-@@ -28,5 +28,8 @@
+@@ -32,7 +32,10 @@ import {
+ } from "./discovery-availability.js";
+ import { addMissingRequiredPluginDiagnostics } from "./discovery-required-plugins.js";
  import type { PluginCandidate, PluginDiscoveryResult } from "./discovery.types.js";
 -import { shouldRejectHardlinkedPluginFiles } from "./hardlink-policy.js";
 +import {
@@ -8,17 +12,17 @@
 +  shouldRejectHardlinkedPluginFiles,
 +} from "./hardlink-policy.js";
  import { hashStableJson } from "./installed-plugin-index-hash.js";
- import { readLegacyNpmPluginDeclaration } from "./legacy-npm-declaration.js";
  import type { PluginBundleFormat, PluginDiagnostic, PluginFormat } from "./manifest-types.js";
-@@ -132,6 +135,7 @@
+ import {
+@@ -116,6 +119,7 @@ function checkSourceEscapesRoot(params: {
  }
-
+ 
  function checkPathStatAndPermissions(params: {
 +  env: NodeJS.ProcessEnv;
    source: string;
    rootDir: string;
    origin: PluginOrigin;
-@@ -191,6 +195,7 @@
+@@ -168,6 +172,7 @@ function checkPathStatAndPermissions(params: {
      if (
        params.origin !== "bundled" &&
        params.uid !== null &&
@@ -26,52 +30,22 @@
        typeof stat.uid === "number" &&
        stat.uid !== params.uid &&
        stat.uid !== 0
-@@ -209,6 +214,7 @@
- }
-
- function findCandidateBlockIssue(params: {
-+  env: NodeJS.ProcessEnv;
-   source: string;
-   rootDir: string;
-   origin: PluginOrigin;
-@@ -222,6 +228,7 @@
-     return escaped;
-   }
-   return checkPathStatAndPermissions({
-+    env: params.env,
-     source: params.source,
-     rootDir: params.rootDir,
-     origin: params.origin,
-@@ -243,6 +250,7 @@
- }
-
- function isUnsafePluginCandidate(params: {
-+  env: NodeJS.ProcessEnv;
-   source: string;
-   rootDir: string;
-   origin: PluginOrigin;
-@@ -251,6 +259,7 @@
-   ownershipUid?: number | null;
- }): boolean {
-   const issue = findCandidateBlockIssue({
-+    env: params.env,
-     source: params.source,
-     rootDir: params.rootDir,
-     origin: params.origin,
-@@ -828,6 +837,7 @@
-     const resolvedRoot = pluginCacheRealpathSync(params.rootDir) ?? path.resolve(params.rootDir);
-     if (
-       isUnsafePluginCandidate({
+@@ -580,6 +585,7 @@ function createPluginScanner(env: NodeJS.ProcessEnv, ownershipUid?: number | nul
+     const issue =
+       checkSourceEscapesRoot({ source: resolved, rootDir: resolvedRoot }) ??
+       checkPathStatAndPermissions({
 +        env,
          source: resolved,
          rootDir: resolvedRoot,
          origin: params.origin,
+diff --git a/src/plugins/hardlink-policy.ts b/src/plugins/hardlink-policy.ts
+index 87892c62851..16baf37165b 100644
 --- a/src/plugins/hardlink-policy.ts
 +++ b/src/plugins/hardlink-policy.ts
-@@ -21,6 +21,13 @@
+@@ -23,6 +23,13 @@ function isNixStorePluginRoot(rootDir: string): boolean {
    return rootRealPath === NIX_STORE_ROOT || rootRealPath.startsWith(`${NIX_STORE_ROOT}/`);
  }
-
+ 
 +export function isTrustedNixStorePluginRoot(params: {
 +  rootDir: string;
 +  env?: NodeJS.ProcessEnv;
@@ -82,7 +56,7 @@
  /** Decides whether plugin file hardlinks should fail boundary validation for one root. */
  export function shouldRejectHardlinkedPluginFiles(params: {
    origin: PluginOrigin;
-@@ -31,7 +38,7 @@
+@@ -33,7 +40,7 @@ export function shouldRejectHardlinkedPluginFiles(params: {
    if (params.origin === "bundled") {
      return false;
    }

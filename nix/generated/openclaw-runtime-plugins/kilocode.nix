@@ -13,15 +13,15 @@
   minHostVersion = ">=2026.6.8";
   expectedIntegrity = "";
   packageName = "@openclaw/kilocode-provider";
-  version = "2026.9.5";
-  tarballUrl = "https://registry.npmjs.org/@openclaw/kilocode-provider/-/kilocode-provider-2026.9.5.tgz";
-  npmIntegrity = "sha512-ZoskO4xbFebuKS3etnHuKj4DsCgnOBGdK2jTyt1eerI7OkdlQiakxU6+QsQKeHfWzI12cC2qapUKpWj3iuE+jQ==";
-  npmShasum = "9533e0db06a1a41b1400f31d96138e793ff96986";
-  nixHash = "sha256-ZOeuKeJ3xZeo8928RGnBcc9sWMvPljjxNczhp3XBT28=";
+  version = "2026.10.1";
+  tarballUrl = "https://registry.npmjs.org/@openclaw/kilocode-provider/-/kilocode-provider-2026.10.1.tgz";
+  npmIntegrity = "sha512-EvAq9JiKetRUuScGQI1ivDfwuukwk31FcVftrihIs+MOKcSW8lMegh7jNi6aLXh6S3cs0cyGKNVZ0EI8Izk/mw==";
+  npmShasum = "327d0f05ea430d03e827207cd721529beab42ca8";
+  nixHash = "sha256-EvCMIxXK0GelSJdgeAphzW+L3Lhlps7HnbmsRfv8isU=";
   dependencyMode = "none";
   manifestId = "kilocode";
-  openclawCompat = ">=2026.9.5";
-  peerOpenClaw = ">=2026.9.5";
+  openclawCompat = ">=2026.10.1";
+  peerOpenClaw = ">=2026.10.1";
   runtimeExtensions = [
     "./dist/index.js"
   ];
