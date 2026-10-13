@@ -13,7 +13,8 @@ let
     nodejs = nodejs_24;
   };
   wrapperSrc = ../npm/openclaw;
-  lock = builtins.fromJSON (builtins.readFile "${wrapperSrc}/package-lock.json");
+  # read in place: read-only evaluation (flake check --no-build) cannot copy the wrapper to the store
+  lock = builtins.fromJSON (builtins.readFile (wrapperSrc + "/package-lock.json"));
   lockedVersion = lock.packages."node_modules/openclaw".version or null;
 in
 
