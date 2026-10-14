@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "name": "queued-source-adoption-e178c39e.patch.gz",
+  "upstream": "openclaw/openclaw",
+  "base": "e178c39e9aae3fa440735217f9aef9574f286677",
+  "sha256": "24db10929dfd52d3787442591e6a6ad84d675e6ffe86352d6085238c3259d9c4",
+  "patchSha256": "513ed9ae123862dff3f4e0b50b212241ddfc6277d429d619f3de862fb84a3405",
+  "files": [
+    "src/agents/embedded-agent-runner/cli-backend-dispatch.test.ts",
+    "src/agents/embedded-agent-runner/cli-backend-dispatch.ts",
+    "src/auto-reply/reply/agent-runner-cli-candidate.ts",
+    "src/auto-reply/reply/agent-runner-embedded-candidate.ts",
+    "src/auto-reply/reply/agent-runner-execute.ts",
+    "src/auto-reply/reply/agent-runner-execution-status.ts",
+    "src/auto-reply/reply/agent-runner-execution.ts",
+    "src/auto-reply/reply/agent-runner-execution.types.ts",
+    "src/auto-reply/reply/agent-runner-result-accounting.ts",
+    "src/auto-reply/reply/agent-runner.runreplyagent.e2e.test.ts",
+    "src/auto-reply/reply/agent-runner-turn-adoption.ts",
+    "src/auto-reply/reply/agent-runner-turn-adoption.test.ts",
+    "src/auto-reply/reply/followup-delivery.ts",
+    "src/auto-reply/reply/reply-operation-run-state.ts"
+  ]
+}
