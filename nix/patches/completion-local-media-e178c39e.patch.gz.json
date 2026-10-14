@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "name": "completion-local-media-e178c39e.patch.gz",
+  "upstream": "openclaw/openclaw",
+  "base": "e178c39e9aae3fa440735217f9aef9574f286677",
+  "sha256": "66dfba82190eb55062e2d1db94ecca50a9530014e7d0551fc7730122e942dc86",
+  "patchSha256": "8f26ce0c0cc06344514378451ad98492a65e179990953c47c20c2cb9feba7d4d",
+  "files": [
+    "src/agents/tools/message-tool-decision.ts",
+    "src/agents/tools/message-tool-execution.ts",
+    "src/agents/tools/message-tool-source-policy.ts",
+    "src/agents/tools/message-tool.completion-media.test.ts",
+    "src/media/outbound-attachment.test.ts",
+    "src/media/outbound-attachment.ts"
+  ]
+}
